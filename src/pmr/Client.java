@@ -24,6 +24,7 @@ public class Client {
 	PMR pmr;
 	InputStream in;
 	OutputStream out;
+	Output audioOut;
 	String ip;
 	boolean enviando;
 	boolean recibiendo;
@@ -144,10 +145,6 @@ public class Client {
 	}
 	public void enviarAudio()
 	{
-		ByteArrayOutputStream o = new ByteArrayOutputStream();
-		o.write((byte)253);
-		enviar(o.toByteArray());
-		Input in=new Input();
 		while(enviando) {
 			try {
 				Thread.sleep(300);
@@ -156,13 +153,19 @@ public class Client {
 			}
 		}
 		enviando = true;
+		Input in=new Input();
 		try {
 			while(pmr.estado == Estado.ComunicacionEstablecida && pmr.descolgado)
 			{
-				out.write(1);
-				out.write(in.getAudio());
+				ByteArrayOutputStream o = new ByteArrayOutputStream();
+				o.write((byte)(pmr.ntren/65536));
+				o.write((byte)((pmr.ntren/256)%256));
+				o.write((byte)(pmr.ntren%256));
+				o.write((byte)253);
+				o.write(in.getAudio());
+				out.write(o.toByteArray());
 			}
-			out.write(0);
+			out.write(new byte[] {(byte)255,(byte)255,(byte)255,(byte)252});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -194,6 +197,20 @@ public class Client {
 			trn = in.read() + trn * 256;
 			trn = in.read() + trn * 256;
 			int code = in.read();
+			if (code != 253 && code != Mensajes.Hable.getId() && code != Mensajes.HableConPMovil.getId() && code != Mensajes.LlamadaGeneral.getId() && code != Mensajes.ConexionMegafonia.getId())
+			{
+				if (audioOut != null)
+				{
+					audioOut.stop();
+					audioOut = null;
+				}
+				if (pmr.estado == Estado.ComunicacionEstablecida || pmr.estado == Estado.ComunicacionRecibida)
+				{
+					pmr.mensaje_recibido = null;
+					pmr.estado = Estado.Normal;
+					pmr.descolgado = false;
+				}
+			}
 			if (code == 255)
 			{
 				int length = in.read();
@@ -206,33 +223,28 @@ public class Client {
 			}
 			else if (code == 253)
 			{
-				if (trn == pmr.ntren || trn == 255*(256*256+256+1))
+				if (audioOut == null && trn == pmr.ntren) audioOut = new Output();
+				byte[] data = new byte[Input.BUFFERSIZE];
+				int numread = 0;
+				while(numread<Input.BUFFERSIZE)
+					numread += in.read(data, numread, Input.BUFFERSIZE-numread);
+				if ((pmr.estado == Estado.ComunicacionEstablecida && pmr.descolgado) || pmr.estado == Estado.ComunicacionRecibida)
 				{
-					if (trn != pmr.ntren) pmr.mensaje_recibido = Mensajes.LlamadaGeneral;
-					Output o = new Output();
-					while(in.read()==1)
-					{
-						byte[] data = new byte[Input.BUFFERSIZE];
-						int numread = 0;
-						while(numread<Input.BUFFERSIZE)
-							numread += in.read(data, numread, Input.BUFFERSIZE-numread);
-						o.play(data);
-					}
-					pmr.descolgado = false;
-					pmr.estado = Estado.Normal;
-					pmr.mensaje_recibido = null;
-					o.stop();
+					if (audioOut == null) audioOut = new Output();
+					audioOut.play(data);
 				}
 			}
+			else if (code == 252) {}
 			else
 			{
-				if (trn == pmr.ntren) pmr.mensajeRecibido(Mensajes.fromId(code));
+				if (trn == pmr.ntren || trn == 0xffffff) pmr.mensajeRecibido(Mensajes.fromId(code));
 			}
+			if (code != 253) recibiendo = false;
 		} catch (IOException e) {
 			client = null;
 			canalconectado = -1;
+			recibiendo = false;
 			e.printStackTrace();
 		}
-		recibiendo = false;
 	}
 }

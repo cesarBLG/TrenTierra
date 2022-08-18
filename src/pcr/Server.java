@@ -1,6 +1,7 @@
 package pcr;
 
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,82 +22,64 @@ public class Server {
 	List<Socket> sockets = new ArrayList<>();
 	HashMap<Socket, OutputStream> outputs = new HashMap<>();
 	PCR pcr;
-	public synchronized void read()
+	Output audioOut;
+	public void read(Socket s)
 	{
-		for (Socket s : sockets)
-		{
-			try {
-				InputStream in = s.getInputStream();
-				if (in.available() >= 4)
+		try {
+			InputStream in = s.getInputStream();
+			int trn = in.read();
+			if (trn == -1) throw new EOFException();
+			trn = in.read() + trn * 256;
+			trn = in.read() + trn * 256;
+			int code = in.read();
+			if (code == 255)
+			{
+				int length = in.read();
+				byte[] data = new byte[length];
+				for (int i=0; i<length; i++)
 				{
-					int trn = in.read();
-					trn = in.read() + trn * 256;
-					trn = in.read() + trn * 256;
-					int code = in.read();
-					if (code == 255)
-					{
-						int length = in.read();
-						byte[] data = new byte[length];
-						for (int i=0; i<length; i++)
-						{
-							data[i] = (byte)in.read();
-						}
-						pcr.textoRecibido(new String(data), trn);
-					}
-					else if (code == 254)
-					{
-						pcr.listatrenes.put(trn, System.currentTimeMillis());
-					}
-					else if (code == 253)
-					{
-						if (trn == pcr.hable_pm1)
-						{
-						}
-						else if (trn == pcr.hable_pm2)
-						{
-							
-						}
-						else
-						{
-							Output o = new Output();
-							while(in.read()==1)
-							{
-								for (Socket s2 : sockets)
-								{
-									try {
-										InputStream in2 = s2.getInputStream();
-										if (s2 == s || in2.available() < 4) continue;
-										in2.mark(4);
-										in2.read();
-										in2.read();
-										in2.read();
-										if (in2.read() == Mensajes.Emergencia.getId())
-										{
-											pcr.hablando = false;
-											in2.reset();
-											break;
-										}
-										in2.reset();
-									} catch(Exception e) {}
-								}
-								byte[] data = new byte[Input.BUFFERSIZE];
-								int numread = 0;
-								while(numread<Input.BUFFERSIZE)
-									numread += in.read(data, numread, Input.BUFFERSIZE-numread);
-								o.play(data);
-							}
-							pcr.hablando = false;
-							o.stop();
-						}
-					}
-					else
-					{
-						pcr.mensajeRecibido(Mensajes.fromId(code), trn);
-					}
+					data[i] = (byte)in.read();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+				pcr.textoRecibido(new String(data), trn);
 			}
+			else if (code == 254)
+			{
+				pcr.listatrenes.put(trn, System.currentTimeMillis());
+			}
+			else if (code == 253)
+			{
+				if (audioOut == null) audioOut = new Output();
+				byte[] data = new byte[Input.BUFFERSIZE];
+				int numread = 0;
+				while(numread<Input.BUFFERSIZE)
+					numread += in.read(data, numread, Input.BUFFERSIZE-numread);
+				audioOut.play(data);
+				int trn2 = -1;
+				if (trn == pcr.hable_pm1) trn2 = pcr.hable_pm2;
+				else if (trn == pcr.hable_pm2) trn2 = pcr.hable_pm1;
+				if (trn2 != -1)
+				{
+				}
+				else
+				{
+					
+				}
+			}
+			else if (code == 252) {}
+			else
+			{
+				pcr.mensajeRecibido(Mensajes.fromId(code), trn);
+			}
+			if (code != 253)
+			{
+				if (audioOut != null)
+				{
+					audioOut.stop();
+					audioOut = null;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	Server(PCR pcr)
@@ -110,20 +93,12 @@ public class Server {
 					Socket s = ss.accept();
 					outputs.put(s, s.getOutputStream());
 					sockets.add(s);
+					new Thread(() -> {
+						while(sockets.contains(s)) read(s);
+					}).start();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
-		}).start();
-		new Thread(() -> {
-			while(true)
-			{
-				read();
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		}).start();
 	}
@@ -220,20 +195,14 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
-		enviar(tren, new byte[] {(byte)253});
 		enviando = true;
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		Input in=new Input();
 		while(pcr.hablando)
 		{
-			writeFast(new byte[] {1});
+			writeFast(new byte[] {(byte)255,(byte)255,(byte)255,(byte)253});
 			writeFast(in.getAudio());
 		}
-		writeFast(new byte[] {0});
+		writeFast(new byte[] {(byte)255,(byte)255,(byte)255,(byte)252});
 		enviando=false;
 		in.stop();
 	}

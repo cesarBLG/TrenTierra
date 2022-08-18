@@ -90,7 +90,8 @@ public class PMR {
 		MensajeEnviado,
 		MensajeRecibido,
 		TextoRecibido,
-		ComunicacionEstablecida
+		ComunicacionEstablecida,
+		ComunicacionRecibida,
 	}
 	Estado estado;
 	String datos_introduciendose;
@@ -212,9 +213,13 @@ public class PMR {
 	{
 		BotonTT.playSound("TT_Aviso.wav");
 		mensaje_recibido = mensaje;
-		if (mensaje_recibido == Mensajes.Hable || mensaje_recibido == Mensajes.ConexionMegafonia || mensaje_recibido == Mensajes.HableConPMovil)
+		if (mensaje_recibido == Mensajes.Hable || mensaje_recibido == Mensajes.HableConPMovil)
 		{
 			estado = Estado.ComunicacionEstablecida;
+		}
+		else if (mensaje_recibido == Mensajes.LlamadaGeneral || mensaje_recibido == Mensajes.ConexionMegafonia)
+		{
+			estado = Estado.ComunicacionRecibida;
 		}
 		else
 		{
@@ -541,6 +546,7 @@ public class PMR {
 				{
 					estado = Estado.Normal;
 					mensaje_recibido = null;
+					descolgado = false;
 				}
 				else
 				{

@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
+import pcr.gui.BotonPCR;
 import pcr.gui.PanelPCR;
 import pmr.PMR.Mensajes;
 import pmr.gui.BotonTT;
@@ -15,6 +16,7 @@ public class PCR {
 	int canal;
 	public HashMap<Integer, Long> listatrenes = new HashMap<>();
 	boolean hablando;
+	boolean llamadaGeneral = false;
 	int hable_pm1=-1;
 	int hable_pm2=-1;
 	public static void main(String args[])
@@ -46,23 +48,59 @@ public class PCR {
 	}
 	public void enviarMensaje(Mensajes mensaje, int tren)
 	{
-		if (mensaje != Mensajes.LlamadaGeneral) server.enviarMensaje(mensaje, tren);
-		if (mensaje == Mensajes.Hable || mensaje == Mensajes.LlamadaGeneral)
+		if (mensaje == Mensajes.LlamadaGeneral)
 		{
-			if (hablando)
+			if (llamadaGeneral)
 			{
-				hablando = false;
+				llamadaGeneral = hablando = false;
+				for (BotonPCR b : panel.botones)
+				{
+					if (!"Llamada general".equals(b.getText())) b.setEnabled(true);
+				}
 			}
 			else
 			{
+				for (BotonPCR b : panel.botones)
+				{
+					if (!"Llamada general".equals(b.getText())) b.setEnabled(false);
+				}
+				llamadaGeneral = true;
 				hablando = true;
+				server.enviarMensaje(mensaje, 0xffffff);
 				new Thread(() -> {
-					server.enviarAudio(mensaje == Mensajes.Hable ? tren : 255*(256*256+256+1));
+					server.enviarAudio(0xffffff);
 				}).start();
 			}
 		}
+		else
+		{
+			if (mensaje == Mensajes.Hable)
+			{
+				if (hablando)
+				{
+					for (BotonPCR b : panel.botones)
+					{
+						if (!"Hable".equals(b.getText())) b.setEnabled(true);
+					}
+					hablando = false;
+					return;
+				}
+				else
+				{
+					for (BotonPCR b : panel.botones)
+					{
+						if (!"Hable".equals(b.getText())) b.setEnabled(false);
+					}
+					hablando = true;
+					new Thread(() -> {
+						server.enviarAudio(tren);
+					}).start();
+				}
+			}
+			server.enviarMensaje(mensaje, tren);
+		}
 	}
-	public void mensajeRecibido(Mensajes mensaje, int tren)
+	public synchronized void mensajeRecibido(Mensajes mensaje, int tren)
 	{
 		JOptionPane.showMessageDialog(null, "Canal "+canal+" Tren "+tren+": "+mensajes_tren.get(mensaje));
 		if (mensaje == Mensajes.Emergencia) enviarMensaje(Mensajes.Hable, tren);

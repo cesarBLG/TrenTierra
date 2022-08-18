@@ -9,7 +9,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
 public class Input {
-	public static int BUFFERSIZE = 512;
+	public static int BUFFERSIZE = 2048;
 	TargetDataLine microphone;
 	public Input()
 	{

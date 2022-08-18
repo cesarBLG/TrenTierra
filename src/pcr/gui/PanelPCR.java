@@ -21,6 +21,7 @@ public class PanelPCR extends JFrame {
 	public PCR pcr;
 	public JLabel display;
 	JTextField ntren;
+	public List<BotonPCR> botones = new ArrayList<>();
 	public PanelPCR(PCR pcr)
 	{
 		this.pcr = pcr;
@@ -48,17 +49,21 @@ public class PanelPCR extends JFrame {
 		add(listatrenes);
 		add(display);
 		add(ntren);
-		add(new BotonPCR("Hable", Botones.Hable));
-		add(new BotonPCR("Conexión Megafonia", Botones.ConexionMegafonia));
-		add(new BotonPCR("Autorizo sistema C", Botones.AutModC));
-		add(new BotonPCR("Suprima parada", Botones.SupresionParada));
-		add(new BotonPCR("Atento a señal", Botones.AtentoSeñal));
-		add(new BotonPCR("Reduzca marcha", Botones.ReduzcaMarcha));
-		add(new BotonPCR("Baje pantografo", Botones.BajePantografo));
-		add(new BotonPCR("Suba pantografo", Botones.SubaPantografo));
-		add(new BotonPCR("Parada inmediata", Botones.AltoUrgente));
-		add(new BotonPCR("Texto", Botones.Texto));
-		add(new BotonPCR("Llamada general", Botones.LlamadaGeneral));
+		botones.add(new BotonPCR("Hable", Botones.Hable));
+		botones.add(new BotonPCR("Conexión Megafonia", Botones.ConexionMegafonia));
+		botones.add(new BotonPCR("Autorizo sistema C", Botones.AutModC));
+		botones.add(new BotonPCR("Suprima parada", Botones.SupresionParada));
+		botones.add(new BotonPCR("Atento a señal", Botones.AtentoSeñal));
+		botones.add(new BotonPCR("Reduzca marcha", Botones.ReduzcaMarcha));
+		botones.add(new BotonPCR("Baje pantografo", Botones.BajePantografo));
+		botones.add(new BotonPCR("Suba pantografo", Botones.SubaPantografo));
+		botones.add(new BotonPCR("Parada inmediata", Botones.AltoUrgente));
+		botones.add(new BotonPCR("Texto", Botones.Texto));
+		botones.add(new BotonPCR("Llamada general", Botones.LlamadaGeneral));
+		for (BotonPCR b : botones)
+		{
+			add(b);
+		}
 		BotonPCR.setPressedActions(this);
 		pack();
 		setVisible(true);
@@ -66,7 +71,13 @@ public class PanelPCR extends JFrame {
 	}
 	void send(Mensajes msg)
 	{
-		pcr.enviarMensaje(msg, Integer.parseInt(ntren.getText()));
+		int trn = -1;
+		try {
+			trn = Integer.parseInt(ntren.getText());
+		} catch (Exception e) {
+			
+		}
+		pcr.enviarMensaje(msg, trn);
 	}
 	void sendText()
 	{
