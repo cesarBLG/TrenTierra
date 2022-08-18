@@ -18,15 +18,16 @@ public class LuzTT extends JLabel {
 		this.pmr = pmr;
 		this.tipo = tipo;
 		luces.add(this);
+		String name_luz = tipo == TipoLuz.CON ? "CONL" : tipo.name();
 		{
-			URL location = getClass().getResource("/Content/Luces/"+tipo.name()+".png");
+			URL location = getClass().getResource("/Content/Luces/"+name_luz+".png");
 		    ImageIcon ic = new ImageIcon(location);
 		    Image img = ic.getImage();
 		    Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/2, img.getHeight(ic.getImageObserver())/2, java.awt.Image.SCALE_SMOOTH);
 			on = new ImageIcon(newimg);
 		}
 		{
-			URL location = getClass().getResource("/Content/Luces/"+tipo.name()+"_off.png");
+			URL location = getClass().getResource("/Content/Luces/"+name_luz+"_off.png");
 		    ImageIcon ic = new ImageIcon(location);
 		    Image img = ic.getImage();
 		    Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/2, img.getHeight(ic.getImageObserver())/2, java.awt.Image.SCALE_SMOOTH);
