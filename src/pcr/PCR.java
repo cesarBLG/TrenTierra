@@ -55,14 +55,14 @@ public class PCR {
 				llamadaGeneral = hablando = false;
 				for (BotonPCR b : panel.botones)
 				{
-					if (!"Llamada general".equals(b.getText())) b.setEnabled(true);
+					b.setEnabled(true);
 				}
 			}
 			else
 			{
 				for (BotonPCR b : panel.botones)
 				{
-					if (!"Llamada general".equals(b.getText())) b.setEnabled(false);
+					b.setEnabled("Llamada general".equals(b.getText()));
 				}
 				llamadaGeneral = true;
 				hablando = true;
@@ -80,7 +80,7 @@ public class PCR {
 				{
 					for (BotonPCR b : panel.botones)
 					{
-						if (!"Hable".equals(b.getText())) b.setEnabled(true);
+						b.setEnabled(true);
 					}
 					hablando = false;
 					return;
@@ -89,7 +89,7 @@ public class PCR {
 				{
 					for (BotonPCR b : panel.botones)
 					{
-						if (!"Hable".equals(b.getText())) b.setEnabled(false);
+						b.setEnabled("Hable".equals(b.getText()));
 					}
 					hablando = true;
 					new Thread(() -> {
@@ -103,7 +103,20 @@ public class PCR {
 	public synchronized void mensajeRecibido(Mensajes mensaje, int tren)
 	{
 		JOptionPane.showMessageDialog(null, "Canal "+canal+" Tren "+tren+": "+mensajes_tren.get(mensaje));
-		if (mensaje == Mensajes.Emergencia) enviarMensaje(Mensajes.Hable, tren);
+		if (mensaje == Mensajes.Emergencia)
+		{
+			llamadaGeneral = hablando = false;
+			while(server.enviando)
+			{
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			enviarMensaje(Mensajes.Hable, tren);
+		}
 		//panel.display.setText();
 	}
 	public void enviarTexto(String texto, int tren)

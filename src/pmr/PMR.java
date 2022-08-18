@@ -573,7 +573,7 @@ public class PMR {
 		}
 		else if (getMensaje(code) != null)
 		{
-			if (modo == Modo.A && ntren != -1 && canal != -1)
+			if (modo == Modo.A && ntren != -1 && canal != -1 && estado != Estado.ComunicacionEstablecida && estado != Estado.ComunicacionRecibida)
 			{
 				estado = Estado.MensajeSeleccionado;
 				mensaje_enviado = getMensaje(code);
