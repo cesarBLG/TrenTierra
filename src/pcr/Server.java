@@ -32,6 +32,7 @@ public class Server {
 			trn = in.read() + trn * 256;
 			trn = in.read() + trn * 256;
 			int code = in.read();
+			if (code == -1) throw new EOFException();
 			if (code == 255)
 			{
 				int length = in.read();

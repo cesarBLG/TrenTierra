@@ -18,7 +18,7 @@ public class PanelTT extends JFrame {
 		add(display);
 		add(new Luces(this));
 		add(new Botones(this));
-		getContentPane().setBackground(Color.black);
+		getContentPane().setBackground(new Color(21,21,21));
 		pack();
 		setVisible(true);
 		setTitle("Puesto movil Tren Tierra");

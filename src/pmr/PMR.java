@@ -150,9 +150,11 @@ public class PMR {
 				String[] token = line.trim().split("=");
 				if (token.length == 2)
 				{
-	    			if (token[0].trim().equalsIgnoreCase("preguntarhora"))
+					token[0] = token[0].trim();
+					token[1] = token[1].trim();
+	    			if (token[0].equalsIgnoreCase("preguntarhora"))
 	    			{
-	    				String val = token[1].trim();
+	    				String val = token[1];
 	    				preguntar_hora = val.equals("1") || val.equalsIgnoreCase("true");
 	    			}
 				}

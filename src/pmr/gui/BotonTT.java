@@ -87,25 +87,20 @@ public class BotonTT extends JButton {
 		}
 	}
 	public static synchronized void playSound(final String url) {
-		new Thread(() -> {
 		try {
 			Clip clip = AudioSystem.getClip();
 			//read audio data from whatever source (file/classloader/etc.)
 			InputStream audioSrc = BotonTT.class.getResourceAsStream("/Content/Sonido/" + url);
-			//add buffer for mark/reset support
-			InputStream bufferedIn = new BufferedInputStream(audioSrc);
-			AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioSrc);
 			clip.open(audioStream);
 			clip.start();
-			Thread.sleep(1000);
 			clip.addLineListener(e -> {
 			    if (e.getType() == LineEvent.Type.STOP) {
-			    	clip.drain();
 					clip.close();
-			      }
-			    });
+			    }
+			});
 		} catch (Exception e) {
 			e.printStackTrace();
-		}}).start();
+		}
 	}
 }

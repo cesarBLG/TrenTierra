@@ -32,7 +32,7 @@ public class Digito extends JLabel {
 			URL location = getClass().getResource("/Content/Digitos/"+nom+".png");
 	    	ImageIcon ic = new ImageIcon(location);
 	    	Image img = ic.getImage();
-	    	Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/3, img.getHeight(ic.getImageObserver())/3, java.awt.Image.SCALE_SMOOTH);
+	    	Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/6, img.getHeight(ic.getImageObserver())/6, java.awt.Image.SCALE_SMOOTH);
 			icon = new ImageIcon(newimg);
 			digitos.put(txt, icon);
 		}

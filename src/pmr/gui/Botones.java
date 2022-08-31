@@ -36,7 +36,7 @@ public class Botones extends JPanel {
 		BotonTT texto = new BotonTT(TipoBoton.TXT);
 		BotonTT confirmacion = new BotonTT(TipoBoton.Confirmacion);
 		
-		setBackground(Color.black);
+		setBackground(new Color(21,21,21));
 		
 		setLayout(new GridBagLayout());
 		GridBagConstraints g = new GridBagConstraints();
