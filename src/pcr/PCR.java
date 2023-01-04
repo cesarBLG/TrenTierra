@@ -102,6 +102,7 @@ public class PCR {
 	}
 	public synchronized void mensajeRecibido(Mensajes mensaje, int tren)
 	{
+		BotonTT.playSound("TT_Aviso.wav");
 		JOptionPane.showMessageDialog(null, "Canal "+canal+" Tren "+tren+": "+mensajes_tren.get(mensaje));
 		if (mensaje == Mensajes.Emergencia)
 		{

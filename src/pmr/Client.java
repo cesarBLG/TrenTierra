@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
@@ -25,7 +27,7 @@ public class Client {
 	InputStream in;
 	OutputStream out;
 	Output audioOut;
-	String ip;
+	Hashtable<Integer, String> ips = new Hashtable<>();
 	boolean enviando;
 	boolean recibiendo;
 	Client(PMR pmr)
@@ -33,7 +35,7 @@ public class Client {
 		this.pmr = pmr;
 		try
 		{
-			FileReader fileReader = new FileReader("pmr_cfg.ini");
+			FileReader fileReader = new FileReader("pmr_ips.ini");
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			String line = bufferedReader.readLine();
 			while (line != null)
@@ -41,11 +43,12 @@ public class Client {
 				String[] token = line.trim().split("=");
 				if (token.length == 2)
 				{
-	    			if (token[0].trim().equalsIgnoreCase("ip"))
-	    			{
-	    				String val = token[1].trim();
-	    				ip = val;
-	    			}
+					String ip = token[0].trim();
+    				String[] canales = token[1].trim().split(",");
+    				for (String canal : canales)
+    				{
+    					ips.put(Integer.parseInt(canal), ip);
+    				}
 				}
 	    		line = bufferedReader.readLine();
 			}
@@ -54,7 +57,14 @@ public class Client {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (ip == null) ip = JOptionPane.showInputDialog("IP a la que conectarse");
+		if (ips.isEmpty())
+		{
+			String ip = JOptionPane.showInputDialog("IP a la que conectarse");
+			for (int i=0; i<100; i++)
+			{
+				ips.put(i, ip);
+			}
+		}
 		new Timer(500, (arg0) -> {new Thread(() -> {update();}).start();}).start();
 		new Timer(10000, (arg0) -> {new Thread(() -> {alive();}).start();}).start();
 		new Thread(() -> {while(true) recibirMensaje();}).start();
@@ -69,7 +79,7 @@ public class Client {
 		{
 			try {
 				if (client != null) client.close();
-				client = new Socket(ip, pmr.canal + 48300);
+				client = new Socket(ips.getOrDefault(pmr.canal, "127.0.0.1"), pmr.canal + 48300);
 				in = client.getInputStream();
 				out = client.getOutputStream();
 				canalconectado = pmr.canal;

@@ -79,6 +79,9 @@ public class Server {
 					audioOut = null;
 				}
 			}
+		} catch (EOFException e) {
+			sockets.remove(s);
+			outputs.remove(s);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

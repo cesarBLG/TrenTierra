@@ -1,6 +1,8 @@
 package pcr.gui;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import pcr.gui.BotonPCR.Botones;
 import pmr.PMR.Mensajes;
 
 
-public class PanelPCR extends JFrame {
+public class PanelPCR extends JFrame implements KeyListener {
 
 	public PCR pcr;
 	public JLabel display;
@@ -51,6 +53,7 @@ public class PanelPCR extends JFrame {
 		add(ntren);
 		botones.add(new BotonPCR("Hable", Botones.Hable));
 		botones.add(new BotonPCR("Conexión Megafonia", Botones.ConexionMegafonia));
+		botones.add(new BotonPCR("Conforme", Botones.ConformeTierra));
 		botones.add(new BotonPCR("Autorizo sistema C", Botones.AutModC));
 		botones.add(new BotonPCR("Suprima parada", Botones.SupresionParada));
 		botones.add(new BotonPCR("Atento a señal", Botones.AtentoSeñal));
@@ -68,6 +71,9 @@ public class PanelPCR extends JFrame {
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addKeyListener(this);
+		setFocusable(true);
+	    setFocusTraversalKeysEnabled(false);
 	}
 	void send(Mensajes msg)
 	{
@@ -82,5 +88,16 @@ public class PanelPCR extends JFrame {
 	void sendText()
 	{
 		pcr.enviarTexto(JOptionPane.showInputDialog("Texto a enviar"), Integer.parseInt(ntren.getText()));
+	}
+	@Override
+	public void keyPressed(KeyEvent key) {
+		System.out.println();
+		if (key.getKeyCode() == KeyEvent.VK_F && key.isControlDown()) setAlwaysOnTop(!isAlwaysOnTop()); 
+	}
+	@Override
+	public void keyReleased(KeyEvent key) {
+	}
+	@Override
+	public void keyTyped(KeyEvent key) {
 	}
 }

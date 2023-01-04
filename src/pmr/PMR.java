@@ -98,6 +98,7 @@ public class PMR {
 	
 	Mensajes mensaje_enviado;
 	Mensajes mensaje_recibido;
+	long tiempo_mensaje;
 	
 	String texto_recibido;
 	String texto_enviado;
@@ -137,6 +138,7 @@ public class PMR {
 	boolean enviar_bien = false;
 	
 	boolean preguntar_hora = false;
+	boolean ontop = false;
 	
 	public PMR()
 	{
@@ -226,7 +228,8 @@ public class PMR {
 		else
 		{
 			estado = Estado.MensajeRecibido;
-			enviar_bien = true;
+			enviar_bien = mensaje_recibido != Mensajes.ConformeTierra;
+			tiempo_mensaje = System.currentTimeMillis();
 		}
 		updateState();
 	}
@@ -296,6 +299,14 @@ public class PMR {
 	void updateState()
 	{
 		String texto = "";
+		if (mensaje_recibido != null && mensaje_recibido != Mensajes.Hable && mensaje_recibido != Mensajes.HableConPMovil
+				&& mensaje_recibido != Mensajes.ConexionMegafonia && mensaje_recibido != Mensajes.LlamadaGeneral
+				&& System.currentTimeMillis() - tiempo_mensaje > 20000)
+		{
+			mensaje_recibido = null;
+			enviar_bien = false;
+			estado = Estado.Normal;
+		}
 		if (mensaje_recibido!=null)
 		{
 			texto += "<"+mensajes_tren.get(mensaje_recibido);
@@ -525,11 +536,8 @@ public class PMR {
 			else if (estado == Estado.MensajeSeleccionado)
 			{
 				estado = Estado.MensajeEnviado;
-				if (mensaje_enviado == Mensajes.ConformeTren)
-				{
-					enviar_bien = false;
-					mensaje_recibido = null;
-				}
+				enviar_bien = false;
+				mensaje_recibido = null;
 				valida = true;
 				enviarMensaje(mensaje_enviado);
 			}
@@ -566,7 +574,7 @@ public class PMR {
 		}
 		else if (code == TipoBoton.Bien)
 		{
-			if (enviar_bien)
+			if (modo == Modo.A && ntren != -1 && canal != -1 && estado != Estado.ComunicacionEstablecida && estado != Estado.ComunicacionRecibida)
 			{
 				estado = Estado.MensajeSeleccionado;
 				mensaje_enviado = Mensajes.ConformeTren;
