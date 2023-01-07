@@ -3,12 +3,15 @@ package pmr.gui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
 import pmr.gui.BotonTT.TipoBoton;
 
 public class PanelAlfanumerico extends JPanel {
+	List<BotonTT> botones = new ArrayList<>();
 	public PanelAlfanumerico()
 	{
 		setOpaque(false);
@@ -32,40 +35,40 @@ public class PanelAlfanumerico extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints g = new GridBagConstraints();
 		g.gridx = g.gridy = 0;
+		g.weighty = g.weightx = 1;
+		g.fill = GridBagConstraints.BOTH;
 		g.insets = new Insets(3, 3, 3, 3);
 		
-		add(ml, g);
-		g.gridx++;
-		add(n0, g);
-		g.gridx++;
-		add(onoff, g);
-		g.gridx=0;
-		g.gridy++;
-		add(n1, g);
-		g.gridx++;
-		add(n2, g);
-		g.gridx++;
-		add(n3, g);
-		g.gridx=0;
-		g.gridy++;
-		add(n4, g);
-		g.gridx++;
-		add(n5, g);
-		g.gridx++;
-		add(n6, g);
-		g.gridx=0;
-		g.gridy++;
-		add(n7, g);
-		g.gridx++;
-		add(n8, g);
-		g.gridx++;
-		add(n9, g);
-		g.gridx=0;
-		g.gridy++;
-		add(modo, g);
-		g.gridx++;
-		add(ncanal, g);
-		g.gridx++;
-		add(ntren, g);
+		botones.add(ml);
+		botones.add(n0);
+		botones.add(onoff);
+		botones.add(n1);
+		botones.add(n2);
+		botones.add(n3);
+		botones.add(n4);
+		botones.add(n5);
+		botones.add(n6);
+		botones.add(n7);
+		botones.add(n8);
+		botones.add(n9);
+		botones.add(modo);
+		botones.add(ncanal);
+		botones.add(ntren);
+		
+		int i=0;
+		for (BotonTT boton : botones)
+		{
+			g.gridx = i%3;
+			g.gridy = i/3;
+			add(boton, g);
+			i++;
+		}
+	}
+	void resize(float scale)
+	{
+		for (BotonTT boton : botones)
+		{
+			boton.resize(scale);
+		}
 	}
 }

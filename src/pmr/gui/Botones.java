@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -11,6 +13,8 @@ import javax.swing.JPanel;
 import pmr.gui.BotonTT.TipoBoton;
 
 public class Botones extends JPanel {
+	List<BotonTT> botones = new ArrayList<>();
+	PanelAlfanumerico numeros;
 	public Botones(PanelTT panel) {
 
 		BotonTT pidohablar = new BotonTT(TipoBoton.PidoHablar);
@@ -41,65 +45,69 @@ public class Botones extends JPanel {
 		setLayout(new GridBagLayout());
 		GridBagConstraints g = new GridBagConstraints();
 		g.anchor = GridBagConstraints.CENTER;
+		g.weightx = g.weighty = 1;
 		g.insets = new Insets(10, 3, 10, 3);
 		g.gridx = g.gridy = 0;
-		add(pidohablar, g);
-		g.gridx++;
-		add(entrobanda, g);
-		g.gridx++;
-		add(bien, g);
-		g.gridx++;
-		add(detenidosenal, g);
-		g.gridx++;
-		add(detenidotren, g);
-		g.gridx++;
-		add(megafonia, g);
-		g.gridx=0;
-		g.gridy++;
-		add(continuomarcha, g);
-		g.gridx++;
-		add(averiaif, g);
-		g.gridx++;
-		add(incidencia, g);
-		g.gridx++;
-		add(ext, g);
-		g.gridx++;
-		add(test, g);
-		g.gridx++;
-		add(interfono, g);
-		g.gridx = 0;
-		g.gridy++;
-		add(peticionvia, g);
-		g.gridx++;
-		add(llegada, g);
-		g.gridx++;
-		add(salida, g);
-		g.gridx++;
-		add(iniciombra, g);
-		g.gridx++;
-		add(finmbra, g);
-		g.gridx++;
-		add(vol, g);
+		botones.add(pidohablar);
+		botones.add(entrobanda);
+		botones.add(bien);
+		botones.add(detenidosenal);
+		botones.add(detenidotren);
+		botones.add(megafonia);
+		botones.add(continuomarcha);
+		botones.add(averiaif);
+		botones.add(incidencia);
+		botones.add(ext);
+		botones.add(test);
+		botones.add(interfono);
+		botones.add(peticionvia);
+		botones.add(llegada);
+		botones.add(salida);
+		botones.add(iniciombra);
+		botones.add(finmbra);
+		botones.add(vol);
+		int i=0;
+		for (BotonTT boton : botones)
+		{
+			g.gridx = i%6;
+			g.gridy = i/6;
+			add(boton, g);
+			i++;
+		}
 
 		g.insets = new Insets(10, 15, 10, 15);
 		g.gridx=6;
 		g.gridy=1;
+		botones.add(clr);
 		add(clr, g);
 		g.gridx++;
+		botones.add(texto);
 		add(texto, g);
 		g.gridx=6;
 		g.gridy=0;
 		g.gridwidth = 2;
+		botones.add(emergencia);
 		add(emergencia, g);
 		g.gridy=2;
+		botones.add(confirmacion);
 		add(confirmacion, g);
 		
 		g.gridy = 0;
 		g.gridx = 8;
 		g.gridheight = 3;
+		g.fill = GridBagConstraints.BOTH;
 		g.insets = new Insets(0, 3, 0, 3);
-		add(new PanelAlfanumerico(), g);
+		numeros = new PanelAlfanumerico();
+		add(numeros, g);
 		
 		BotonTT.setPressedActions(panel);
+	}
+	void resize(float scale)
+	{
+		for (BotonTT boton : botones)
+		{
+			boton.resize(scale);
+		}
+		numeros.resize(scale);
 	}
 }

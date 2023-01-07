@@ -9,10 +9,13 @@ import javax.swing.JLabel;
 
 public class Digito extends JLabel {
 	static HashMap<Character, ImageIcon> digitos = new HashMap<>();
+	char current;
+	float scale=1/6.0f;
 	public Digito() {
 		set(' ');
 	}
 	public void set(char txt) {
+		current = txt;
 		ImageIcon icon;
 		if (digitos.containsKey(txt))
 		{
@@ -32,10 +35,16 @@ public class Digito extends JLabel {
 			URL location = getClass().getResource("/Content/Digitos/"+nom+".png");
 	    	ImageIcon ic = new ImageIcon(location);
 	    	Image img = ic.getImage();
-	    	Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/6, img.getHeight(ic.getImageObserver())/6, java.awt.Image.SCALE_SMOOTH);
+	    	Image newimg = img.getScaledInstance((int)(img.getWidth(ic.getImageObserver())*scale), (int)(img.getHeight(ic.getImageObserver())*scale), java.awt.Image.SCALE_SMOOTH);
 			icon = new ImageIcon(newimg);
 			digitos.put(txt, icon);
 		}
 		setIcon(icon);
+	}
+	void resize(float scale)
+	{
+		this.scale = scale/6;
+		digitos.clear();
+		set(current);
 	}
 }

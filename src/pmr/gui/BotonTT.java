@@ -1,6 +1,8 @@
 package pmr.gui;
 
 import java.awt.Image;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -67,15 +69,20 @@ public class BotonTT extends JButton {
 		tipo = t;
 		botones.add(this);
 		setBorder(null);
-		/*setOpaque(false);
+		setOpaque(false);
 		setBorderPainted(false);
 		setContentAreaFilled(false);
-		setHorizontalAlignment(CENTER);
+		/*setHorizontalAlignment(CENTER);
 		setVerticalAlignment(CENTER);*/
+		resize(1);
+	}
+	public void resize(float scale)
+	{
+		scale = scale/2;
 		URL location = getClass().getResource("/Content/Botones/"+tipo.name().toLowerCase()+".png");
     	ImageIcon ic = new ImageIcon(location);
     	Image img = ic.getImage();
-    	Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/2, img.getHeight(ic.getImageObserver())/2, java.awt.Image.SCALE_SMOOTH);
+    	Image newimg = img.getScaledInstance((int)(img.getWidth(ic.getImageObserver())*scale), (int)(img.getHeight(ic.getImageObserver())*scale), java.awt.Image.SCALE_SMOOTH);
 		setIcon(new ImageIcon(newimg));
 	}
 	public static void setPressedActions(PanelTT panel)

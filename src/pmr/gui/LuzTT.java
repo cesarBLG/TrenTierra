@@ -7,32 +7,23 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import pmr.PMR;
 
 public class LuzTT extends JLabel {
 	static List<LuzTT> luces = new ArrayList<>();
 	PMR pmr;
+	String name_luz;
 	LuzTT(TipoLuz tipo, PMR pmr)
 	{
 		this.pmr = pmr;
 		this.tipo = tipo;
+		//setOpaque(true);
+		setHorizontalAlignment(SwingConstants.CENTER);
 		luces.add(this);
-		String name_luz = tipo == TipoLuz.CON ? "CONL" : tipo.name();
-		{
-			URL location = getClass().getResource("/Content/Luces/"+name_luz+".png");
-		    ImageIcon ic = new ImageIcon(location);
-		    Image img = ic.getImage();
-		    Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/2, img.getHeight(ic.getImageObserver())/2, java.awt.Image.SCALE_SMOOTH);
-			on = new ImageIcon(newimg);
-		}
-		{
-			URL location = getClass().getResource("/Content/Luces/"+name_luz+"_off.png");
-		    ImageIcon ic = new ImageIcon(location);
-		    Image img = ic.getImage();
-		    Image newimg = img.getScaledInstance(img.getWidth(ic.getImageObserver())/2, img.getHeight(ic.getImageObserver())/2, java.awt.Image.SCALE_SMOOTH);
-			off = new ImageIcon(newimg);
-		}
+		name_luz = tipo == TipoLuz.CON ? "CONL" : tipo.name();
+		resize(1);
 	}
 	enum TipoLuz
 	{
@@ -56,12 +47,26 @@ public class LuzTT extends JLabel {
 		else if (tipo == TipoLuz.ML && pmr.descolgado) return true;
 		return false;
 	}
-	static public void update()
+	public void update()
 	{
-		for (LuzTT l : luces)
+		setIcon(encendida() ? on : off);
+	}
+	void resize(float scale)
+	{
+		scale /= 2;
 		{
-			if (l.encendida()) l.setIcon(l.on);
-			else l.setIcon(l.off);
+			URL location = getClass().getResource("/Content/Luces/"+name_luz+".png");
+		    ImageIcon ic = new ImageIcon(location);
+		    Image img = ic.getImage();
+		    Image newimg = img.getScaledInstance((int)(img.getWidth(ic.getImageObserver())*scale), (int)(img.getHeight(ic.getImageObserver())*scale), java.awt.Image.SCALE_SMOOTH);
+			on = new ImageIcon(newimg);
+		}
+		{
+			URL location = getClass().getResource("/Content/Luces/"+name_luz+"_off.png");
+		    ImageIcon ic = new ImageIcon(location);
+		    Image img = ic.getImage();
+		    Image newimg = img.getScaledInstance((int)(img.getWidth(ic.getImageObserver())*scale), (int)(img.getHeight(ic.getImageObserver())*scale), java.awt.Image.SCALE_SMOOTH);
+			off = new ImageIcon(newimg);
 		}
 	}
 }

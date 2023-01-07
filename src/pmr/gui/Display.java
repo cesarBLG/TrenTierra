@@ -25,4 +25,10 @@ public class Display extends JPanel {
 			else digitos[i].set(' ');
 		}
 	}
+	void resize(float scale)
+	{
+		for (int i=0; i<40; i++) {
+			digitos[i].resize(scale);
+		}
+	}
 }
