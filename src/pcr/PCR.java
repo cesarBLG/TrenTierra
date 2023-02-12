@@ -122,7 +122,8 @@ public class PCR {
 	}
 	public synchronized void mensajeRecibido(Mensajes mensaje, int tren)
 	{
-		BotonTT.playSound("pop-6.wav"); // Localizacionn sonido: https://creatorassets.com/a/pop-sound-effects
+		//BotonTT.playSound("pop-6.wav"); // Localizacionn sonido: https://creatorassets.com/a/pop-sound-effects
+		BotonTT.playSound("TT_Aviso.wav");
 		//JOptionPane.showMessageDialog(null, "Canal "+canal+" Tren "+tren+": "+mensajes_tren.get(mensaje));
 		panel.textLlamadaEnt.append( "[" + getTime() + "] Canal " + canal + " Tren " + tren + ": " + mensajes_tren.get(mensaje) + "\r\n");
 		if (mensaje == Mensajes.Emergencia)

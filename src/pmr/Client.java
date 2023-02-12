@@ -28,6 +28,7 @@ public class Client {
 	OutputStream out;
 	Output audioOut;
 	Hashtable<Integer, String> ips = new Hashtable<>();
+	boolean p2p = false;
 	boolean enviando;
 	boolean recibiendo;
 	Client(PMR pmr)
@@ -60,6 +61,7 @@ public class Client {
 		if (ips.isEmpty())
 		{
 			String ip = JOptionPane.showInputDialog("IP a la que conectarse");
+			p2p = true;
 			for (int i=0; i<100; i++)
 			{
 				ips.put(i, ip);
@@ -79,9 +81,10 @@ public class Client {
 		{
 			try {
 				if (client != null) client.close();
-				client = new Socket(ips.getOrDefault(pmr.canal, "127.0.0.1"), pmr.canal + 48300);
+				client = new Socket(ips.getOrDefault(pmr.canal, "127.0.0.1"), p2p ? (48300 + pmr.canal) : 48301);
 				in = client.getInputStream();
 				out = client.getOutputStream();
+				out.write(new byte[] {(byte)pmr.canal,(byte)1});
 				canalconectado = pmr.canal;
 				alive();
 			} catch (IOException e) {

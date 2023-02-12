@@ -1,7 +1,9 @@
 package pcr;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -19,8 +22,10 @@ import streaming.Input;
 import streaming.Output;
 
 public class Server {
+	boolean local;
 	List<Socket> sockets = new ArrayList<>();
 	HashMap<Socket, OutputStream> outputs = new HashMap<>();
+	String ip = "local";
 	PCR pcr;
 	Output audioOut;
 	public void read(Socket s)
@@ -89,20 +94,85 @@ public class Server {
 	Server(PCR pcr)
 	{
 		this.pcr = pcr;
+		try
+		{
+			FileReader fileReader = new FileReader("pmr_ips.ini");
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			String line = bufferedReader.readLine();
+			while (line != null)
+			{
+				String[] token = line.trim().split("=");
+				if (token.length == 2)
+				{
+					String ip = token[0].trim();
+    				String[] canales = token[1].trim().split(",");
+    				for (String canal : canales)
+    				{
+    					if (Integer.parseInt(canal) == pcr.canal)
+    					{
+    						this.ip = ip;
+    						break;
+    					}
+    				}
+				}
+	    		line = bufferedReader.readLine();
+			}
+			bufferedReader.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		new Thread(() -> {
-			try {
-				ServerSocket ss = new ServerSocket(48300+pcr.canal);
+			if (ip.equals("local"))
+			{
+				try {
+					ServerSocket ss = new ServerSocket(48300+pcr.canal);
+					while(true)
+					{
+						Socket s = ss.accept();
+						try {
+							InputStream in = s.getInputStream();
+							if (in.read() != pcr.canal) continue;
+							if (in.read() != 1) continue;
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+							continue;
+						}
+						outputs.put(s, s.getOutputStream());
+						sockets.add(s);
+						new Thread(() -> {
+							while(sockets.contains(s)) read(s);
+						}).start();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else
+			{
 				while(true)
 				{
-					Socket s = ss.accept();
-					outputs.put(s, s.getOutputStream());
-					sockets.add(s);
-					new Thread(() -> {
-						while(sockets.contains(s)) read(s);
-					}).start();
+					try {
+						Socket s = new Socket(ip, 48301);
+						if (s != null)
+						{
+							OutputStream out = s.getOutputStream();
+							out.write(new byte[] {(byte)pcr.canal, (byte)0});
+							outputs.put(s, out);
+							sockets.add(s);
+							while(sockets.contains(s)) read(s);
+						}
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}).start();
 	}

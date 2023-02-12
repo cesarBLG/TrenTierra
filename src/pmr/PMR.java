@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 
 import javax.swing.Timer;
+import javax.xml.soap.Text;
 
 import pmr.gui.BotonTT;
 import pmr.gui.BotonTT.TipoBoton;
@@ -26,6 +27,7 @@ public class PMR {
 	int ntren = -1;
 	
 	public Client client;
+	public Arduino arduino;
 	
 	public static void main(String[] args)
 	{
@@ -142,6 +144,7 @@ public class PMR {
 	
 	public PMR()
 	{
+		arduino = new Arduino(this);
 		try
 		{
 			FileReader fileReader = new FileReader("pmr_cfg.ini");
@@ -378,6 +381,7 @@ public class PMR {
 		else if (enviar_bien) texto += " ENVIAR \" B I E N \" ";
 		
 		panel.display.setText(texto);
+		arduino.sendData("tt::estado="+texto);
 	}
 	public Mensajes getMensaje(TipoBoton code)
 	{

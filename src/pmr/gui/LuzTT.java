@@ -38,6 +38,7 @@ public class LuzTT extends JLabel {
 	TipoLuz tipo;
 	ImageIcon on;
 	ImageIcon off;
+	boolean prevenc;
 	boolean encendida()
 	{
 		if (pmr.client == null) return false;
@@ -49,7 +50,10 @@ public class LuzTT extends JLabel {
 	}
 	public void update()
 	{
-		setIcon(encendida() ? on : off);
+		boolean enc = encendida();
+		setIcon(enc ? on : off);
+		if (prevenc != enc) pmr.arduino.sendData("tt::luz::"+(tipo == TipoLuz.megafonia ? "alt" : tipo.name().toLowerCase())+'='+(enc ? '1' : '0'));
+		prevenc = enc;
 	}
 	void resize(float scale)
 	{

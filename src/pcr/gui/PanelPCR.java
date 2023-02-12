@@ -33,6 +33,8 @@ import javax.swing.DropMode;
 import javax.swing.JTabbedPane;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -195,7 +197,7 @@ public class PanelPCR extends JFrame {
 					trenes += i.toString() + "\n";
 				}
 			}
-			JOptionPane.showMessageDialog(null, trenes, "Lista de trenes", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(PanelPCR.this, trenes, "Lista de trenes", JOptionPane.INFORMATION_MESSAGE);
 		});
 	    gbc.gridy++;
 	    add(listaTrenes, gbc);
@@ -204,6 +206,26 @@ public class PanelPCR extends JFrame {
         setSize(700, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+
+        this.addComponentListener(new ComponentListener() 
+		{
+			@Override
+			public void componentHidden(ComponentEvent arg0) {}
+			@Override
+			public void componentMoved(ComponentEvent arg0) {}
+			@Override
+			public void componentResized(ComponentEvent arg0) {
+				Dimension size = getSize();
+				float scale = (float) Math.min(size.getHeight()/500, size.getWidth()/700);
+				if (scale > 0)
+				{
+					textLlamadaSal.setFont(new Font("Monospaced", Font.PLAIN, (int)(11*scale)));
+					textLlamadaEnt.setFont(new Font("Monospaced", Font.PLAIN, (int)(11*scale)));
+				}
+			}
+			@Override
+			public void componentShown(ComponentEvent arg0) {}
+		});
     }
 
     void send(Mensajes msg) {
